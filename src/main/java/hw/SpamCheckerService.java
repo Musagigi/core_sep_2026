@@ -13,8 +13,10 @@ public class SpamCheckerService {
     public static void main(String[] args) {
         SpamCheckerService analyticsService = new SpamCheckerService("");
         try {
-            SpamCheckerService.SpamCheckResults results = analyticsService.verifySpam("Шлюхи возле тебя, поблизости всего 500 метров . Переходи по ссылке чтобы найти их!");
-            SpamCheckerService.SpamCheckResults results1 = analyticsService.verifySpam("Резюме Василий Петров. Дата рождения 1978-06-05. Пожалуйста найдите детали в приложении");
+            SpamCheckerService.SpamCheckResults results = analyticsService
+                    .verifySpam("Шлюхи возле тебя, поблизости всего 500 метров . Переходи по ссылке чтобы найти их!");
+            SpamCheckerService.SpamCheckResults results1 = analyticsService.verifySpam(
+                    "Резюме Василий Петров. Дата рождения 1978-06-05. Пожалуйста найдите детали в приложении");
             System.out.println("results: " + results.getShortSpamDescription());
             System.out.println("results: " + results.getSpamProbability());
 
@@ -25,12 +27,9 @@ public class SpamCheckerService {
         }
     }
 
+    private static final String API_URL = "https://routerai.ru/api/v1/chat/completions";
 
-    private static final String API_URL =
-            "https://openrouter.ai/api/v1/chat/completions";
-
-    private static final String MODEL =
-            "deepseek/deepseek-chat";
+    private static final String MODEL = "deepseek/deepseek-v4-pro-0813";
 
     private final String API_KEY;
 
@@ -143,8 +142,7 @@ public class SpamCheckerService {
                 """.formatted(
                 jsonString(MODEL),
                 jsonString(systemInstructions),
-                jsonString(input)
-        );
+                jsonString(input));
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL))
@@ -155,14 +153,12 @@ public class SpamCheckerService {
 
         HttpResponse<String> response = CLIENT.send(
                 request,
-                HttpResponse.BodyHandlers.ofString()
-        );
+                HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new RuntimeException(
                     "OpenRouter error " + response.statusCode()
-                            + ": " + response.body()
-            );
+                            + ": " + response.body());
         }
 
         return extractSpamCheckResults(response.body());
@@ -174,32 +170,26 @@ public class SpamCheckerService {
                 response,
                 "choices",
                 "message",
-                "content"
-        );
+                "content");
 
         if (content == null || content.isBlank()) {
             throw new RuntimeException(
-                    "OpenRouter returned an empty message content: " + response
-            );
+                    "OpenRouter returned an empty message content: " + response);
         }
 
-        double spamProbability =
-                extractJsonNumber(content, "spamProbability");
+        double spamProbability = extractJsonNumber(content, "spamProbability");
 
-        String shortSpamDescription =
-                extractJsonString(content, "shortSpamDescription");
+        String shortSpamDescription = extractJsonString(content, "shortSpamDescription");
 
         if (spamProbability < 0.0 || spamProbability > 1.0) {
             throw new RuntimeException(
-                    "Invalid spam probability: " + spamProbability
-            );
+                    "Invalid spam probability: " + spamProbability);
         }
 
         if (shortSpamDescription == null) {
             throw new RuntimeException(
                     "Missing shortSpamDescription in model response: "
-                            + content
-            );
+                            + content);
         }
 
         return SpamCheckResults.builder()
@@ -210,8 +200,7 @@ public class SpamCheckerService {
 
     private static String extractJsonString(
             String json,
-            String... path
-    ) {
+            String... path) {
         String current = json;
 
         for (String key : path) {
@@ -219,8 +208,7 @@ public class SpamCheckerService {
 
             if (keyPosition < 0) {
                 throw new RuntimeException(
-                        "JSON key not found: " + key
-                );
+                        "JSON key not found: " + key);
             }
 
             int colon = skipWhitespace(current, keyPosition);
@@ -228,16 +216,14 @@ public class SpamCheckerService {
             if (colon >= current.length()
                     || current.charAt(colon) != ':') {
                 throw new RuntimeException(
-                        "Invalid JSON after key: " + key
-                );
+                        "Invalid JSON after key: " + key);
             }
 
             int valueStart = skipWhitespace(current, colon + 1);
 
             if (valueStart >= current.length()) {
                 throw new RuntimeException(
-                        "Missing JSON value for key: " + key
-                );
+                        "Missing JSON value for key: " + key);
             }
 
             char first = current.charAt(valueStart);
@@ -249,19 +235,16 @@ public class SpamCheckerService {
                 if (first == '{' || first == '[') {
                     int end = findMatchingBracket(
                             current,
-                            valueStart
-                    );
+                            valueStart);
 
                     current = current.substring(
                             valueStart,
-                            end + 1
-                    );
+                            end + 1);
                     continue;
                 }
 
                 throw new RuntimeException(
-                        "Expected JSON string for key: " + key
-                );
+                        "Expected JSON string for key: " + key);
             }
 
             return parseJsonString(current, valueStart);
@@ -272,14 +255,12 @@ public class SpamCheckerService {
 
     private static double extractJsonNumber(
             String json,
-            String key
-    ) {
+            String key) {
         int keyPosition = findJsonKey(json, key);
 
         if (keyPosition < 0) {
             throw new RuntimeException(
-                    "JSON key not found: " + key
-            );
+                    "JSON key not found: " + key);
         }
 
         int colon = skipWhitespace(json, keyPosition);
@@ -287,8 +268,7 @@ public class SpamCheckerService {
         if (colon >= json.length()
                 || json.charAt(colon) != ':') {
             throw new RuntimeException(
-                    "Invalid JSON after key: " + key
-            );
+                    "Invalid JSON after key: " + key);
         }
 
         int start = skipWhitespace(json, colon + 1);
@@ -312,19 +292,16 @@ public class SpamCheckerService {
 
         if (start == end) {
             throw new RuntimeException(
-                    "Expected number for key: " + key
-            );
+                    "Expected number for key: " + key);
         }
 
         try {
             return Double.parseDouble(
-                    json.substring(start, end)
-            );
+                    json.substring(start, end));
         } catch (NumberFormatException e) {
             throw new RuntimeException(
                     "Invalid number for key " + key,
-                    e
-            );
+                    e);
         }
     }
 
@@ -334,8 +311,7 @@ public class SpamCheckerService {
      */
     private static int findJsonKey(
             String json,
-            String key
-    ) {
+            String key) {
         String quotedKey = "\"" + key + "\"";
 
         boolean insideString = false;
@@ -371,12 +347,10 @@ public class SpamCheckerService {
 
     private static String parseJsonString(
             String json,
-            int start
-    ) {
+            int start) {
         if (json.charAt(start) != '"') {
             throw new RuntimeException(
-                    "Expected JSON string at position " + start
-            );
+                    "Expected JSON string at position " + start);
         }
 
         StringBuilder result = new StringBuilder();
@@ -425,25 +399,21 @@ public class SpamCheckerService {
                     case 'u':
                         if (i + 4 >= json.length()) {
                             throw new RuntimeException(
-                                    "Invalid Unicode escape in JSON"
-                            );
+                                    "Invalid Unicode escape in JSON");
                         }
 
                         String hex = json.substring(
                                 i + 1,
-                                i + 5
-                        );
+                                i + 5);
 
                         try {
                             result.append(
-                                    (char) Integer.parseInt(hex, 16)
-                            );
+                                    (char) Integer.parseInt(hex, 16));
                         } catch (NumberFormatException e) {
                             throw new RuntimeException(
                                     "Invalid Unicode escape: \\u"
                                             + hex,
-                                    e
-                            );
+                                    e);
                         }
 
                         i += 4;
@@ -451,8 +421,7 @@ public class SpamCheckerService {
 
                     default:
                         throw new RuntimeException(
-                                "Invalid JSON escape: \\" + c
-                        );
+                                "Invalid JSON escape: \\" + c);
                 }
 
                 escaped = false;
@@ -472,14 +441,12 @@ public class SpamCheckerService {
         }
 
         throw new RuntimeException(
-                "Unterminated JSON string"
-        );
+                "Unterminated JSON string");
     }
 
     private static int findMatchingBracket(
             String json,
-            int start
-    ) {
+            int start) {
         char opening = json.charAt(start);
 
         char closing;
@@ -490,8 +457,7 @@ public class SpamCheckerService {
             closing = ']';
         } else {
             throw new RuntimeException(
-                    "Not a JSON object or array"
-            );
+                    "Not a JSON object or array");
         }
 
         int depth = 0;
@@ -533,14 +499,12 @@ public class SpamCheckerService {
         }
 
         throw new RuntimeException(
-                "Unclosed JSON structure"
-        );
+                "Unclosed JSON structure");
     }
 
     private static int skipWhitespace(
             String value,
-            int start
-    ) {
+            int start) {
         int i = start;
 
         while (i < value.length()
@@ -595,8 +559,7 @@ public class SpamCheckerService {
                     if (c < 0x20) {
                         result.append(String.format(
                                 "\\u%04x",
-                                (int) c
-                        ));
+                                (int) c));
                     } else {
                         result.append(c);
                     }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,9 +140,9 @@
             text-align: center;
             background: #ffffff;
             transition:
-                    border-color 0.15s ease,
-                    background 0.15s ease,
-                    box-shadow 0.15s ease;
+                border-color 0.15s ease,
+                background 0.15s ease,
+                box-shadow 0.15s ease;
         }
 
         .choice label:hover {
@@ -163,13 +164,13 @@
             color: #7b8794;
         }
 
-        .choice input:checked + label {
+        .choice input:checked+label {
             border-color: #2563eb;
             background: #eff6ff;
             box-shadow: 0 0 0 1px #2563eb;
         }
 
-        .choice input:checked + label .choice-name {
+        .choice input:checked+label .choice-name {
             color: #1d4ed8;
         }
 
@@ -273,326 +274,272 @@
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <div class="header">
-        <h1>Travel Ticket</h1>
-        <p>Enter passenger information and generate a travel ticket.</p>
-    </div>
+        <div class="header">
+            <h1>Travel Ticket</h1>
+            <p>Enter passenger information and generate a travel ticket.</p>
+        </div>
 
-    <div class="card">
+        <div class="card">
 
-        <div class="card-top"></div>
+            <div class="card-top"></div>
 
-        <form id="form" class="form">
+            <form id="form" class="form">
 
-            <!-- Travel type -->
-            <div class="section">
-                <p class="section-title">Travel type</p>
+                <!-- Travel type -->
+                <div class="section">
+                    <p class="section-title">Travel type</p>
 
-                <div class="choices">
+                    <div class="choices">
 
-                    <div class="choice">
-                        <input
-                                id="type-avia"
-                                name="type"
-                                type="radio"
-                                value="AVIA"
-                                required
-                        >
+                        <div class="choice">
+                            <input id="type-avia" name="type" type="radio" value="AVIA" required>
 
-                        <label for="type-avia">
-                            <span class="choice-name">AVIA</span>
-                            <span class="choice-description">
-                                Air travel
-                            </span>
-                        </label>
+                            <label for="type-avia">
+                                <span class="choice-name">AVIA</span>
+                                <span class="choice-description">
+                                    Air travel
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="choice">
+                            <input id="type-railway" name="type" type="radio" value="RAILWAY" required>
+
+                            <label for="type-railway">
+                                <span class="choice-name">RAILWAY</span>
+                                <span class="choice-description">
+                                    Railway travel
+                                </span>
+                            </label>
+                        </div>
+
                     </div>
+                </div>
 
-                    <div class="choice">
-                        <input
-                                id="type-railway"
-                                name="type"
-                                type="radio"
-                                value="RAILWAY"
-                                required
-                        >
+                <!-- Passenger -->
+                <div class="section">
+                    <p class="section-title">Passenger information</p>
 
-                        <label for="type-railway">
-                            <span class="choice-name">RAILWAY</span>
-                            <span class="choice-description">
-                                Railway travel
-                            </span>
-                        </label>
+                    <div class="row">
+
+                        <div>
+                            <label for="name">
+                                Name
+                                <input id="name" name="name" type="text" autocomplete="given-name" required>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label for="surname">
+                                Surname
+                                <input id="surname" name="surname" type="text" autocomplete="family-name" required>
+                            </label>
+                        </div>
+
                     </div>
+                </div>
+
+                <!-- Date of birth -->
+                <div class="section">
+
+                    <label for="dob">
+                        Date of birth
+                        <input id="dob" name="dob" type="date" autocomplete="bday" required>
+                    </label>
 
                 </div>
-            </div>
 
-            <!-- Passenger -->
-            <div class="section">
-                <p class="section-title">Passenger information</p>
+                <!-- Comment -->
+                <div class="section">
 
-                <div class="row">
-
-                    <div>
-                        <label for="name">
-                            Name
-                            <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    autocomplete="given-name"
-                                    required
-                            >
-                        </label>
-                    </div>
-
-                    <div>
-                        <label for="surname">
-                            Surname
-                            <input
-                                    id="surname"
-                                    name="surname"
-                                    type="text"
-                                    autocomplete="family-name"
-                                    required
-                            >
-                        </label>
-                    </div>
+                    <label for="comment">
+                        Comment
+                        <textarea id="comment" name="comment" placeholder="Additional information..."
+                            required></textarea>
+                    </label>
 
                 </div>
-            </div>
 
-            <!-- Date of birth -->
-            <div class="section">
+                <div class="divider"></div>
 
-                <label for="dob">
-                    Date of birth
-                    <input
-                            id="dob"
-                            name="dob"
-                            type="date"
-                            autocomplete="bday"
-                            required
-                    >
-                </label>
+                <!-- Luggage -->
+                <div class="section">
 
-            </div>
+                    <p class="section-title">Luggage</p>
 
-            <!-- Comment -->
-            <div class="section">
+                    <div class="luggage">
 
-                <label for="comment">
-                    Comment
-                    <textarea
-                            id="comment"
-                            name="comment"
-                            placeholder="Additional information..."
-                            required
-                    ></textarea>
-                </label>
+                        <div class="luggage-header">
 
-            </div>
+                            <input id="has-luggage" name="has_luggage" type="checkbox" value="1">
 
-            <div class="divider"></div>
+                            <label for="has-luggage">
+                                Passenger has luggage
+                            </label>
 
-            <!-- Luggage -->
-            <div class="section">
+                        </div>
 
-                <p class="section-title">Luggage</p>
+                        <div class="luggage-number">
 
-                <div class="luggage">
+                            <label for="luggage">
+                                Number of luggage items
 
-                    <div class="luggage-header">
+                                <input id="luggage" name="luggage" type="number" min="0" step="1" value="0" disabled>
+                            </label>
 
-                        <input
-                                id="has-luggage"
-                                name="has_luggage"
-                                type="checkbox"
-                                value="1"
-                        >
-
-                        <label for="has-luggage">
-                            Passenger has luggage
-                        </label>
-
-                    </div>
-
-                    <div class="luggage-number">
-
-                        <label for="luggage">
-                            Number of luggage items
-
-                            <input
-                                    id="luggage"
-                                    name="luggage"
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    value="0"
-                                    disabled
-                            >
-                        </label>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                <!-- Output format -->
+                <div class="section">
 
-            <!-- Output format -->
-            <div class="section">
+                    <label for="file_type">
+                        Returned file type
 
-                <label for="file_type">
-                    Returned file type
+                        <select id="file_type" name="file_type" required>
+                            <option value="pdf">PDF</option>
+                            <option value="png">PNG</option>
+                        </select>
+                    </label>
 
-                    <select
-                            id="file_type"
-                            name="file_type"
-                            required
-                    >
-                        <option value="pdf">PDF</option>
-                        <option value="png">PNG</option>
-                    </select>
-                </label>
+                    <p class="hint">
+                        Choose the format of the generated travel ticket.
+                    </p>
 
-                <p class="hint">
-                    Choose the format of the generated travel ticket.
-                </p>
+                </div>
 
-            </div>
+                <button id="submit-button" class="submit-button" type="submit">
+                    Generate ticket
+                </button>
 
-            <button
-                    id="submit-button"
-                    class="submit-button"
-                    type="submit"
-            >
-                Generate ticket
-            </button>
+            </form>
 
-        </form>
+        </div>
+
+        <div id="status"></div>
 
     </div>
 
-    <div id="status"></div>
+    <script>
+        const form = document.getElementById("form");
+        const status = document.getElementById("status");
+        const submitButton = document.getElementById("submit-button");
 
-</div>
+        const hasLuggage = document.getElementById("has-luggage");
+        const luggage = document.getElementById("luggage");
 
-<script>
-    const form = document.getElementById("form");
-    const status = document.getElementById("status");
-    const submitButton = document.getElementById("submit-button");
+        hasLuggage.addEventListener("change", () => {
+            luggage.disabled = !hasLuggage.checked;
 
-    const hasLuggage = document.getElementById("has-luggage");
-    const luggage = document.getElementById("luggage");
+            if (hasLuggage.checked) {
+                luggage.value = "1";
+            } else {
+                luggage.value = "0";
+            }
+        });
 
-    hasLuggage.addEventListener("change", () => {
-        luggage.disabled = !hasLuggage.checked;
+        form.addEventListener("submit", async (event) => {
 
-        if (hasLuggage.checked) {
-            luggage.value = "1";
-        } else {
-            luggage.value = "0";
-        }
-    });
-
-    form.addEventListener("submit", async (event) => {
-
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
-        event.preventDefault();
-
-        status.classList.add("visible");
-        status.textContent = "Generating ticket...";
-
-        submitButton.disabled = true;
-
-        const formData = new FormData(form);
-        const params = new URLSearchParams();
-
-        for (const [key, value] of formData.entries()) {
-            params.append(key, value);
-        }
-
-        /*
-         * A disabled input is not included in FormData.
-         * Always send a luggage value to the backend.
-         */
-        if (!hasLuggage.checked) {
-            params.set("luggage", "0");
-        }
-
-        try {
-            const response = await fetch("/api/generate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: params.toString()
-            });
-
-            if (!response.ok) {
-                const error = await response.text();
-                throw new Error(error);
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
 
-            const blob = await response.blob();
+            event.preventDefault();
+
+            status.classList.add("visible");
+            status.textContent = "Generating ticket...";
+
+            submitButton.disabled = true;
+
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+
+            for (const [key, value] of formData.entries()) {
+                params.append(key, value);
+            }
 
             /*
-             * Prefer the filename supplied by the backend.
+             * A disabled input is not included in FormData.
+             * Always send a luggage value to the backend.
              */
-            const disposition = response.headers.get(
-                "Content-Disposition"
-            );
+            if (!hasLuggage.checked) {
+                params.set("luggage", "0");
+            }
 
-            let fileName = "travel-ticket";
+            try {
+                const response = await fetch("/api/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: params.toString()
+                });
 
-            if (disposition) {
-                const match = disposition.match(
-                    /filename="([^"]+)"/
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error);
+                }
+
+                const blob = await response.blob();
+
+                /*
+                 * Prefer the filename supplied by the backend.
+                 */
+                const disposition = response.headers.get(
+                    "Content-Disposition"
                 );
 
-                if (match) {
-                    fileName = match[1];
+                let fileName = "travel-ticket";
+
+                if (disposition) {
+                    const match = disposition.match(
+                        /filename="([^"]+)"/
+                    );
+
+                    if (match) {
+                        fileName = match[1];
+                    }
                 }
+
+                if (fileName === "travel-ticket") {
+                    const fileType = formData.get("file_type");
+                    fileName += "." + fileType;
+                }
+
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = fileName;
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                URL.revokeObjectURL(url);
+
+                status.textContent =
+                    "Travel ticket generated successfully.";
+
+            } catch (error) {
+                console.error(error);
+
+                status.textContent =
+                    "Error: " + error.message;
+
+            } finally {
+                submitButton.disabled = false;
             }
-
-            if (fileName === "travel-ticket") {
-                const fileType = formData.get("file_type");
-                fileName += "." + fileType;
-            }
-
-            const url = URL.createObjectURL(blob);
-
-            const link = document.createElement("a");
-
-            link.href = url;
-            link.download = fileName;
-
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-
-            URL.revokeObjectURL(url);
-
-            status.textContent =
-                "Travel ticket generated successfully.";
-
-        } catch (error) {
-            console.error(error);
-
-            status.textContent =
-                "Error: " + error.message;
-
-        } finally {
-            submitButton.disabled = false;
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
+
 </html>

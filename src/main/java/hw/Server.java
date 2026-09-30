@@ -34,8 +34,7 @@ public class Server {
         try {
             String body = new String(
                     exchange.getRequestBody().readAllBytes(),
-                    StandardCharsets.UTF_8
-            );
+                    StandardCharsets.UTF_8);
             Map<String, String> form = parseForm(body);
             String type = form.get("type");
             String name = form.get("name");
@@ -66,8 +65,7 @@ public class Server {
             headers.set("Content-Type", contentType);
             headers.set(
                     "Content-Disposition",
-                    "attachment; filename=\"" + fileName + "\""
-            );
+                    "attachment; filename=\"" + fileName + "\"");
             headers.set("Content-Length", String.valueOf(responseFileBytes.length));
 
             exchange.sendResponseHeaders(200, responseFileBytes.length);
@@ -106,8 +104,7 @@ public class Server {
 
             exchange.getResponseHeaders().set(
                     "Content-Type",
-                    "text/html; charset=UTF-8"
-            );
+                    "text/html; charset=UTF-8");
 
             exchange.sendResponseHeaders(200, content.length);
 
@@ -129,8 +126,7 @@ public class Server {
 
             String key = URLDecoder.decode(
                     parts[0],
-                    StandardCharsets.UTF_8
-            );
+                    StandardCharsets.UTF_8);
 
             String value = parts.length > 1
                     ? URLDecoder.decode(parts[1], StandardCharsets.UTF_8)
@@ -149,15 +145,13 @@ public class Server {
     private static void sendText(
             HttpExchange exchange,
             int status,
-            String text
-    ) throws IOException {
+            String text) throws IOException {
 
         byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
 
         exchange.getResponseHeaders().set(
                 "Content-Type",
-                "text/plain; charset=UTF-8"
-        );
+                "text/plain; charset=UTF-8");
 
         exchange.sendResponseHeaders(status, bytes.length);
 
