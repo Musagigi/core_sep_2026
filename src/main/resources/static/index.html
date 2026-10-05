@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+
+    ```
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .user-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .user-card p {
+            margin: 7px 0;
+            color: #555;
+        }
+
+        .form-container {
+            max-width: 600px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .submit-button {
+            padding: 11px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .submit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .message.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .loading {
+            color: #666;
+        }
+
+        .empty {
+            color: #666;
+            padding: 20px 0;
+        }
+    </style>
+    ```
+
+</head>
+
+<body>
+
+<div class="container">
+
+    ```
+    <h1>User Management</h1>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('usersTab', this)">
+            All Users
+        </button>
+
+        <button class="tab-button" onclick="showTab('addUserTab', this)">
+            Add User
+        </button>
+    </div>
+
+    <!-- ===================== -->
+    <!-- ALL USERS TAB -->
+    <!-- ===================== -->
+
+    <div id="usersTab" class="tab-content active">
+
+        <h2>All Users</h2>
+
+        <div id="usersContainer">
+            <p class="loading">Loading users...</p>
+        </div>
+
+    </div>
+
+
+    <!-- ===================== -->
+    <!-- ADD USER TAB -->
+    <!-- ===================== -->
+
+    <div id="addUserTab" class="tab-content">
+
+        <h2>Add New User</h2>
+
+        <div class="form-container">
+
+            <form id="userForm">
+
+                <div class="form-group">
+                    <label for="id">ID</label>
+                    <input
+                            type="number"
+                            id="id"
+                            name="id"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="surname">Surname</label>
+                    <input
+                            type="text"
+                            id="surname"
+                            name="surname"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input
+                            type="text"
+                            id="country"
+                            name="country"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="profession">Profession</label>
+                    <input
+                            type="text"
+                            id="profession"
+                            name="profession"
+                            required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            required
+                    >
+                </div>
+
+                <button type="submit" class="submit-button">
+                    Create User
+                </button>
+
+            </form>
+
+            <div id="message" class="message"></div>
+
+        </div>
+
+    </div>
+    ```
+
+</div>
+
+<script>
+
+    const API_URL =
+        `${window.location.protocol}//${window.location.hostname}:8080/api/users`;
+
+    function showTab(tabId, button) {
+
+        document.querySelectorAll(".tab-content")
+            .forEach(tab => tab.classList.remove("active"));
+
+        document.querySelectorAll(".tab-button")
+            .forEach(btn => btn.classList.remove("active"));
+
+        document.getElementById(tabId)
+            .classList.add("active");
+
+        button.classList.add("active");
+
+        // Refresh users when opening the users tab
+        if (tabId === "usersTab") {
+            loadUsers();
+        }
+    }
+
+
+    // =========================
+    // GET ALL USERS
+    // =========================
+
+    async function loadUsers() {
+
+        const container = document.getElementById("usersContainer");
+
+        container.innerHTML =
+            '<p class="loading">Loading users...</p>';
+
+        try {
+
+            const response = await fetch(API_URL);
+
+            if (!response.ok) {
+                throw new Error(
+                    `Failed to load users: ${response.status}`
+                );
+            }
+
+            const users = await response.json();
+
+            renderUsers(users);
+
+        } catch (error) {
+
+            console.error(error);
+
+            container.innerHTML = `
+                <div class="message error">
+                    Could not load users.
+                    ${error.message}
+                </div>
+            `;
+        }
+    }
+
+
+    function renderUsers(users) {
+
+        const container =
+            document.getElementById("usersContainer");
+
+        if (!users || users.length === 0) {
+
+            container.innerHTML =
+                '<p class="empty">No users found.</p>';
+
+            return;
+        }
+
+        container.innerHTML = "";
+
+        const grid = document.createElement("div");
+
+        grid.className = "users-grid";
+
+        users.forEach(user => {
+
+            const card = document.createElement("div");
+
+            card.className = "user-card";
+
+            card.innerHTML = `
+                <h3>
+                    ${escapeHtml(user.name)}
+                    ${escapeHtml(user.surname)}
+                </h3>
+
+                <p><strong>ID:</strong> ${user.id}</p>
+
+                <p><strong>Age:</strong> ${user.age}</p>
+
+                <p><strong>Country:</strong>
+                    ${escapeHtml(user.country)}
+                </p>
+
+                <p><strong>Profession:</strong>
+                    ${escapeHtml(user.profession)}
+                </p>
+
+                <p><strong>Email:</strong>
+                    ${escapeHtml(user.email)}
+                </p>
+            `;
+
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    document
+        .getElementById("userForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const form = event.target;
+
+            const user = {
+                id: Number(document.getElementById("id").value),
+                name: document.getElementById("name").value,
+                surname: document.getElementById("surname").value,
+                age: Number(document.getElementById("age").value),
+                country: document.getElementById("country").value,
+                profession: document.getElementById("profession").value,
+                email: document.getElementById("email").value
+            };
+
+            const message =
+                document.getElementById("message");
+
+            try {
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(user)
+                });
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+                    throw new Error(
+                        errorText ||
+                        `Failed to create user: ${response.status}`
+                    );
+                }
+
+                const createdUser =
+                    await response.json();
+
+                message.className =
+                    "message success";
+
+                message.textContent =
+                    `User ${createdUser.name} ${createdUser.surname} created successfully.`;
+
+                form.reset();
+
+                // Refresh the users list
+                await loadUsers();
+
+                // Switch to Users tab
+                document
+                    .querySelector(".tab-button")
+                    .click();
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.className =
+                    "message error";
+
+                message.textContent =
+                    `Could not create user: ${error.message}`;
+            }
+        });
+
+    function escapeHtml(value) {
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    loadUsers();
+
+</script>
+
+</body>
+</html>
