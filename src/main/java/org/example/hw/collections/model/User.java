@@ -2,12 +2,14 @@ package org.example.hw.collections.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Builder
 @Data
+@Jacksonized
 public class User {
     private final Long id;
     private final String name;
@@ -19,8 +21,10 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         User user = (User) o;
         return Objects.equals(id, user.id);
@@ -31,6 +35,3 @@ public class User {
         return Objects.hashCode(id);
     }
 }
-
-
-
