@@ -1,20 +1,37 @@
 package com.kotojava.lesson3.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.LocalDate;
+import java.util.Objects;
+
 @Builder
+@Data
+@Jacksonized
 public class User {
-    private long id;
-    private String name;
-    private String surname;
-    private int age;
-    private String country;
-    private String profession;
-    private String email;
+    private final Long id;
+    private final String name;
+    private final LocalDate birthDate;
+    private final String city;
+    private final String address;
+    private final String email;
+    private final String phone;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

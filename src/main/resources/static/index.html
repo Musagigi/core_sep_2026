@@ -1,504 +1,385 @@
 <!DOCTYPE html>
+<html lang="ru">
 
-<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
-
-    ```
+    <title>Пользователи</title>
     <style>
+        :root {
+            --border: #ddd;
+            --bg: #f7f7f9;
+            --accent: #2b6cb0;
+            --error: #c53030;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6fa;
+            padding: 24px;
+            background: var(--bg);
             color: #222;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
         h1 {
-            margin-bottom: 25px;
+            margin: 0 0 16px;
+            font-size: 22px;
         }
 
-        .tabs {
+        form {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: end;
         }
 
-        .tab-button {
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
+        form label {
+            display: flex;
+            flex-direction: column;
+            font-size: 12px;
+            color: #666;
+            gap: 4px;
+        }
+
+        input,
+        select,
+        button {
+            font: inherit;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        button {
             cursor: pointer;
-            font-size: 16px;
-            border-bottom: 3px solid transparent;
         }
 
-        .tab-button.active {
-            border-bottom-color: #2563eb;
-            color: #2563eb;
-            font-weight: bold;
+        button.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
         }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .user-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .user-card h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .user-card p {
-            margin: 7px 0;
+        #status {
+            min-height: 20px;
+            font-size: 13px;
             color: #555;
+            margin-bottom: 12px;
         }
 
-        .form-container {
-            max-width: 600px;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        #status.error {
+            color: var(--error);
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        input {
+        table {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        input:focus {
-            outline: none;
-            border-color: #2563eb;
+        th,
+        td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
         }
 
-        .submit-button {
-            padding: 11px 20px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
+        th {
+            background: #eef2f7;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        /* --- Индикаторы сортировки --- */
+        th.sortable {
             cursor: pointer;
-            font-size: 15px;
+            position: relative;
+            padding-right: 22px;
+            /* место под значок */
         }
 
-        .submit-button:hover {
-            background: #1d4ed8;
+        th.sortable:hover {
+            background: #e2e8f0;
         }
 
-        .message {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 6px;
-            display: none;
+        /* Значок по умолчанию — «можно сортировать» */
+        th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #9aa5b1;
+            transition: color .15s;
         }
 
-        .message.success {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
+        /* Активная сортировка: по возрастанию */
+        th.sortable[data-dir="asc"]::after {
+            content: '↑';
+            color: var(--accent);
+            font-weight: 700;
         }
 
-        .message.error {
-            display: block;
-            background: #fee2e2;
-            color: #991b1b;
+        /* Активная сортировка: по убыванию */
+        th.sortable[data-dir="desc"]::after {
+            content: '↓';
+            color: var(--accent);
+            font-weight: 700;
         }
 
-        .loading {
+        /* Наведение на неактивную — чуть темнее значок */
+        th.sortable:not([data-dir]):hover::after {
+            color: #4a5568;
+        }
+
+        /* --- /Индикаторы сортировки --- */
+
+        tbody tr {
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: #f0f7ff;
+        }
+
+        td.empty {
+            text-align: center;
+            color: #888;
+            padding: 24px;
+        }
+
+        #detail {
+            margin-top: 16px;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        #detail h2 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        #detail dl {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 6px 12px;
+            margin: 0;
+        }
+
+        #detail dt {
             color: #666;
         }
 
-        .empty {
-            color: #666;
-            padding: 20px 0;
+        #detail dd {
+            margin: 0;
         }
     </style>
-    ```
-
 </head>
 
 <body>
 
-<div class="container">
+    <h1>Пользователи</h1>
 
-    ```
-    <h1>User Management</h1>
+    <form id="filters">
+        <label>Сортировка
+            <select name="sort">
+                <option value="">По ID (по умолчанию)</option>
+                <option value="name">По имени</option>
+            </select>
+        </label>
+        <label>Дата рождения с
+            <input type="date" name="from">
+        </label>
+        <label>по
+            <input type="date" name="to">
+        </label>
+        <label>Год рождения
+            <input type="number" name="year" min="1900" max="2100" placeholder="например 1990">
+        </label>
+        <label>Email содержит
+            <input type="text" name="emailContains" placeholder="gmail">
+        </label>
+        <button type="submit" class="primary">Применить</button>
+        <button type="button" id="reset">Сбросить</button>
+    </form>
 
-    <!-- Tabs -->
-    <div class="tabs">
-        <button class="tab-button active" onclick="showTab('usersTab', this)">
-            All Users
-        </button>
+    <div id="status"></div>
 
-        <button class="tab-button" onclick="showTab('addUserTab', this)">
-            Add User
-        </button>
-    </div>
+    <div id="detail" hidden></div>
 
-    <!-- ===================== -->
-    <!-- ALL USERS TAB -->
-    <!-- ===================== -->
-
-    <div id="usersTab" class="tab-content active">
-
-        <h2>All Users</h2>
-
-        <div id="usersContainer">
-            <p class="loading">Loading users...</p>
-        </div>
-
-    </div>
+    <table id="users-table">
+        <thead>
+            <tr>
+                <th class="sortable" data-sort="id" title="Сортировать по «ID»">ID</th>
+                <th class="sortable" data-sort="name" title="Сортировать по «Имя»">Имя</th>
+                <th>Дата рождения</th>
+                <th>Город</th>
+                <th>Адрес</th>
+                <th>Email</th>
+                <th>Телефон</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
 
-    <!-- ===================== -->
-    <!-- ADD USER TAB -->
-    <!-- ===================== -->
 
-    <div id="addUserTab" class="tab-content">
+    <script>
+        const API = '/api/users';
 
-        <h2>Add New User</h2>
+        const form = document.getElementById('filters');
+        const statusEl = document.getElementById('status');
+        const tbody = document.querySelector('#users-table tbody');
+        const detailEl = document.getElementById('detail');
+        const sortableHeaders = document.querySelectorAll('th.sortable');
 
-        <div class="form-container">
+        const esc = s => s == null ? '' :
+            String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-            <form id="userForm">
-
-                <div class="form-group">
-                    <label for="id">ID</label>
-                    <input
-                            type="number"
-                            id="id"
-                            name="id"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="surname">Surname</label>
-                    <input
-                            type="text"
-                            id="surname"
-                            name="surname"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input
-                            type="number"
-                            id="age"
-                            name="age"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="country">Country</label>
-                    <input
-                            type="text"
-                            id="country"
-                            name="country"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="profession">Profession</label>
-                    <input
-                            type="text"
-                            id="profession"
-                            name="profession"
-                            required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            required
-                    >
-                </div>
-
-                <button type="submit" class="submit-button">
-                    Create User
-                </button>
-
-            </form>
-
-            <div id="message" class="message"></div>
-
-        </div>
-
-    </div>
-    ```
-
-</div>
-
-<script>
-
-    const API_URL =
-        `${window.location.protocol}//${window.location.hostname}:8080/api/users`;
-
-    function showTab(tabId, button) {
-
-        document.querySelectorAll(".tab-content")
-            .forEach(tab => tab.classList.remove("active"));
-
-        document.querySelectorAll(".tab-button")
-            .forEach(btn => btn.classList.remove("active"));
-
-        document.getElementById(tabId)
-            .classList.add("active");
-
-        button.classList.add("active");
-
-        // Refresh users when opening the users tab
-        if (tabId === "usersTab") {
-            loadUsers();
+        function setStatus(msg, isError = false) {
+            statusEl.textContent = msg;
+            statusEl.className = isError ? 'error' : '';
         }
-    }
 
-
-    // =========================
-    // GET ALL USERS
-    // =========================
-
-    async function loadUsers() {
-
-        const container = document.getElementById("usersContainer");
-
-        container.innerHTML =
-            '<p class="loading">Loading users...</p>';
-
-        try {
-
-            const response = await fetch(API_URL);
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to load users: ${response.status}`
-                );
+        function collectParams() {
+            const fd = new FormData(form);
+            const params = {};
+            for (const [k, v] of fd.entries()) {
+                if (v !== '') params[k] = v;
             }
-
-            const users = await response.json();
-
-            renderUsers(users);
-
-        } catch (error) {
-
-            console.error(error);
-
-            container.innerHTML = `
-                <div class="message error">
-                    Could not load users.
-                    ${error.message}
-                </div>
-            `;
-        }
-    }
-
-
-    function renderUsers(users) {
-
-        const container =
-            document.getElementById("usersContainer");
-
-        if (!users || users.length === 0) {
-
-            container.innerHTML =
-                '<p class="empty">No users found.</p>';
-
-            return;
+            return params;
         }
 
-        container.innerHTML = "";
-
-        const grid = document.createElement("div");
-
-        grid.className = "users-grid";
-
-        users.forEach(user => {
-
-            const card = document.createElement("div");
-
-            card.className = "user-card";
-
-            card.innerHTML = `
-                <h3>
-                    ${escapeHtml(user.name)}
-                    ${escapeHtml(user.surname)}
-                </h3>
-
-                <p><strong>ID:</strong> ${user.id}</p>
-
-                <p><strong>Age:</strong> ${user.age}</p>
-
-                <p><strong>Country:</strong>
-                    ${escapeHtml(user.country)}
-                </p>
-
-                <p><strong>Profession:</strong>
-                    ${escapeHtml(user.profession)}
-                </p>
-
-                <p><strong>Email:</strong>
-                    ${escapeHtml(user.email)}
-                </p>
-            `;
-
-            grid.appendChild(card);
-        });
-
-        container.appendChild(grid);
-    }
-
-    document
-        .getElementById("userForm")
-        .addEventListener("submit", async function(event) {
-
-            event.preventDefault();
-
-            const form = event.target;
-
-            const user = {
-                id: Number(document.getElementById("id").value),
-                name: document.getElementById("name").value,
-                surname: document.getElementById("surname").value,
-                age: Number(document.getElementById("age").value),
-                country: document.getElementById("country").value,
-                profession: document.getElementById("profession").value,
-                email: document.getElementById("email").value
-            };
-
-            const message =
-                document.getElementById("message");
-
+        async function fetchUsers(params) {
+            const qs = new URLSearchParams(params).toString();
+            const url = qs ? `${API}?${qs}` : API;
+            setStatus('Загрузка...');
             try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const users = await res.json();
+                renderTable(users);
+                const note = params.year && (params.from || params.to)
+                    ? ' (год приоритетнее, from/to проигнорированы сервером)'
+                    : '';
+                setStatus(`Найдено: ${users.length}${note}`);
+            } catch (e) {
+                setStatus('Ошибка: ' + e.message, true);
+                tbody.innerHTML = '';
+            }
+        }
 
-                const response = await fetch(API_URL, {
-                    method: "POST",
+        function renderTable(users) {
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">Ничего не найдено</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.map(u => `
+    <tr data-id="${u.id}">
+      <td>${u.id}</td>
+      <td>${esc(u.name)}</td>
+      <td>${u.birthDate ?? ''}</td>
+      <td>${esc(u.city)}</td>
+      <td>${esc(u.address)}</td>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.phone)}</td>
+    </tr>
+  `).join('');
+        }
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+        async function loadUser(id) {
+            detailEl.hidden = false;
+            detailEl.textContent = 'Загрузка...';
+            try {
+                const res = await fetch(`${API}/${id}`);
+                if (res.status === 404) { detailEl.textContent = `Пользователь #${id} не найден`; return; }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const u = await res.json();
+                detailEl.innerHTML = `
+      <h2>Карточка #${u.id}</h2>
+      <dl>
+        <dt>Имя</dt><dd>${esc(u.name)}</dd>
+        <dt>Дата рождения</dt><dd>${u.birthDate ?? ''}</dd>
+        <dt>Город</dt><dd>${esc(u.city)}</dd>
+        <dt>Адрес</dt><dd>${esc(u.address)}</dd>
+        <dt>Email</dt><dd>${esc(u.email)}</dd>
+        <dt>Телефон</dt><dd>${esc(u.phone)}</dd>
+      </dl>
+      <p><button id="close-detail">Закрыть</button></p>
+    `;
+                document.getElementById('close-detail').onclick = () => { detailEl.hidden = true; };
+            } catch (e) {
+                detailEl.textContent = 'Ошибка: ' + e.message;
+            }
+        }
 
-                    body: JSON.stringify(user)
-                });
+        /* --- Индикаторы сортировки --- */
 
-                if (!response.ok) {
+        function updateSortIndicators() {
+            const current = form.elements.sort.value; // '' или 'name'
+            sortableHeaders.forEach(th => {
+                const key = th.dataset.sort;
+                // Пустой sort на бэке = сортировка по id по возрастанию
+                const isActive = (current === '' && key === 'id') || current === key;
+                if (isActive) {
+                    th.dataset.dir = 'asc'; // бэк умеет только asc
+                } else {
+                    delete th.dataset.dir;
+                }
+            });
+        }
 
-                    const errorText =
-                        await response.text();
+        sortableHeaders.forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.dataset.sort;
+                const current = form.elements.sort.value;
 
-                    throw new Error(
-                        errorText ||
-                        `Failed to create user: ${response.status}`
-                    );
+                if (current === key) {
+                    // Уже отсортировано по этой колонке (asc) — бэк не поддерживает desc,
+                    // поэтому повторный клик ничего не меняет. Заглушка на будущее.
+                    return;
                 }
 
-                const createdUser =
-                    await response.json();
-
-                message.className =
-                    "message success";
-
-                message.textContent =
-                    `User ${createdUser.name} ${createdUser.surname} created successfully.`;
-
-                form.reset();
-
-                // Refresh the users list
-                await loadUsers();
-
-                // Switch to Users tab
-                document
-                    .querySelector(".tab-button")
-                    .click();
-
-            } catch (error) {
-
-                console.error(error);
-
-                message.className =
-                    "message error";
-
-                message.textContent =
-                    `Could not create user: ${error.message}`;
-            }
+                // id — это «дефолтная» сортировка, в параметр не пишем
+                form.elements.sort.value = (key === 'id' ? '' : key);
+                fetchUsers(collectParams());
+                updateSortIndicators();
+            });
         });
 
-    function escapeHtml(value) {
+        /* --- /Индикаторы сортировки --- */
 
-        if (value === null || value === undefined) {
-            return "";
-        }
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            fetchUsers(collectParams());
+        });
 
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+        document.getElementById('reset').onclick = () => {
+            form.reset();
+            detailEl.hidden = true;
+            fetchUsers({}).then(updateSortIndicators);
+        };
 
-    loadUsers();
+        tbody.addEventListener('click', e => {
+            const tr = e.target.closest('tr[data-id]');
+            if (tr) loadUser(tr.dataset.id);
+        });
 
-</script>
-
+        /* Стартовая загрузка + расстановка индикаторов */
+        fetchUsers({}).then(updateSortIndicators);
+    </script>
 </body>
+
 </html>
