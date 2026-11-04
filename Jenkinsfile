@@ -2,23 +2,21 @@ pipeline {
     agent any
 
     stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
         stage('Build DB image') {
-            steps {
-                sh 'docker build -f DbDockerfile -t loandb:0.5 .'
-            }
+            steps { sh 'docker build -f DbDockerfile -t loandb:0.5 .' }
         }
 
         stage('Build app image') {
-            steps {
-                sh 'docker build -t hw5app:0.1 .'
-            }
+            steps { sh 'docker build -t hw5app:0.1 .' }
         }
 
         stage('Cleanup old containers') {
             steps {
-                sh '''
-                    docker rm -f hw5app hw-5-postgres hw-5-mortgage-minio || true
-                '''
+                sh 'docker rm -f hw5app hw-5-postgres hw-5-mortgage-minio || true'
             }
         }
 
@@ -63,31 +61,21 @@ pipeline {
             }
         }
 
-        stage('Start app container') {
+        stage('Start app') {
             steps {
                 sh '''
                     docker run -d --name hw5app \
                       -p 4343:8080 \
                       -e MINIO_USER=minioadmin \
                       -e MINIO_PASSWORD=minioadmin \
-                      -e MINIO_URL=http://localhost:9000 \
-                      -e POSTGRES_HOSTNAME=localhost \
+                      -e MINIO_URL=http://host.docker.internal:9000 \
+                      -e POSTGRES_HOSTNAME=host.docker.internal \
                       -e POSTGRES_PORT=5439 \
                       -e POSTGRES_DATABASE=mortgage \
                       -e POSTGRES_USER=mortgage \
                       -e POSTGRES_PASSWORD=mortgage \
-                      hw5app:0.1 \
-                      sleep infinity
+                      hw5app:0.1
                 '''
-            }
-        }
-
-        stage('Pull / Build / Test / Run') {
-            steps {
-                sh 'docker exec hw5app git -C /app pull'
-                sh 'docker exec hw5app /app/gradlew clean build -x test'
-                sh 'docker exec hw5app /app/gradlew test'
-                sh 'docker exec -d hw5app java -jar /app/build/libs/lesson3-0.0.1-SNAPSHOT.jar'
             }
         }
 

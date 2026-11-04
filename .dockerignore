@@ -1,0 +1,9 @@
+build/
+.git/
+.idea/
+*.iml
+scripts/
+*.sql
+DbDockerfile
+docker-compose.yaml
+Jenkinsfile
