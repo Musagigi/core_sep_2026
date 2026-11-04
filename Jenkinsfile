@@ -40,7 +40,7 @@ pipeline {
                       -e MINIO_ROOT_USER=minioadmin \
                       -e MINIO_ROOT_PASSWORD=minioadmin \
                       -p 9000:9000 -p 9001:9001 \
-                      cgr.dev/chainguard/minio:latest \
+                      pgsty/silo:latest \
                       server /data --console-address ":9001"
                 '''
             }
