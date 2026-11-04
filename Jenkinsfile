@@ -83,7 +83,7 @@ pipeline {
             steps {
                 sh '''
                     for i in $(seq 1 30); do
-                      curl -sf http://localhost:4343/actuator/health && exit 0
+                      curl -sf http://host.docker.internal:4343/actuator/health && exit 0
                       sleep 2
                     done
                     echo "App is not healthy"
